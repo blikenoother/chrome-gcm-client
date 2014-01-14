@@ -10,7 +10,7 @@ try:
 except ImportError:
     import omnijson as json
 
-# all you need
+# required class
 __all__ = ('ChromeGcmAuthenticationError', 'ChromeGcmBadRequestError',
            'ChromeGcmUnexpectedError', 'JSONMessage', 'PlainTextMessage',
            'ChromeGCM', 'Result')
@@ -19,7 +19,7 @@ __all__ = ('ChromeGcmAuthenticationError', 'ChromeGcmBadRequestError',
 #: Default URL to GCM service.
 GCM_URL = 'https://www.googleapis.com/gcm_for_chrome/v1/messages'
 
-#: Default URL to GCM service.
+#: Default URL to Google oauth2 token
 REFRESH_TOKEN_URL = 'https://accounts.google.com/o/oauth2/token'
 
 
@@ -34,7 +34,7 @@ class ChromeGcmBadRequestError(Exception):
 
 
 class ChromeGcmUnexpectedError(Exception):
-    """ Raised if unknown exception occurred. """
+    """ Raised if any unknown exception occurred. """
     pass
 
 
@@ -42,19 +42,32 @@ class Message(object):
     """ Base message class. """
 
     def __init__(self, message, channel_ids, subchannel_id=0):
+        """ Abstract message.
+
+            :Arguments:
+                - `message` (str or dict): payload of this message.
+                - `channel_ids` (lists): chrome channel id's to send message.
+                - `subchannel_id` (int): chrome sub channel id
+
+            Refer to `Send message <http://developer.chrome.com/apps/cloudMessaging.html#message>`_
+            for more explanation on available options.
+        """
         self._message = message
         self.__channel_ids = channel_ids
         self.__subchannel_id = subchannel_id
 
     def _prepare_payload(self):
+        """ Hook to format message data payload. """
         return self._message
 
     @property
     def channel_ids(self):
+        """ Target channel id's. """
         return self.__channel_ids
 
     @property
     def subchannel_id(self):
+        """ Target sub channel id. """
         return self.__subchannel_id
 
 
@@ -67,6 +80,7 @@ class JSONMessage(Message):
     """ JSON formatted message. """
 
     def _prepare_payload(self):
+        """ Serializes message to JSON. """
         return json.dumps(self._message)
 
 
@@ -95,7 +109,20 @@ class ChromeGCM(object):
     token_expires_in = None
 
     def __init__(self, auth_info):
+        """ Create new connection if auth_info is dict.
 
+            :Arguments:
+                - auth_info (str or dict): google oauth2 access_token in string or google app credentials in dict to generate access_token ``{'client_id': '', 'client_secret': '', 'refresh_token': '', 'grant_type': 'refresh_token'}``.
+
+            Refer to `Get refresh token <http://developer.chrome.com/apps/cloudMessaging.html#refresh>`_
+            for more explanation on available options.
+
+            :Raises:
+                - ``ValueError`` if auth_info is not basestring or dict.
+                - ``requests.exceptions.RequestException`` on any network problem.
+                - :class:`ChromeGcmBadRequestError` auth_info is invalid.
+                - :class:`ChromeGcmUnexpectedError` unknown exception occurred with explanation.
+        """
         if isinstance(auth_info, basestring):
             self.access_token = auth_info
 
@@ -106,7 +133,19 @@ class ChromeGCM(object):
             raise ValueError('Invalid auth_info type. Please refer docstring.')
 
     def send(self, message):
-        """ Send message. """
+        """ Send message.
+
+            :Arguments:
+                `message` (:class:`Message`): plain text or JSON message.
+
+            :Returns:
+                :class:`Result` interpreting the results.
+
+            :Raises:
+                - ``ValueError`` if message is not :class:`Message` object.
+                - ``requests.exceptions.RequestException`` on any network problem.
+                - :class:`ChromeGcmAuthenticationError` access_token is invalid.
+        """
 
         if not isinstance(message, Message):
             raise ValueError('Invalid message object.')
