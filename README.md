@@ -30,7 +30,7 @@ auth_info = {
 channel_ids = ['channel_id_1', 'channel_id_2', 'channel_id_3']
 
 # plain text message object
-plain_text_msg = PlainTextMessage('', channel_ids)
+plain_text_msg = PlainTextMessage('test message', channel_ids)
 
 # json message object
 json_msg = JSONMessage({'title': 'this is title', 'body':'this is body'}, channel_ids)
