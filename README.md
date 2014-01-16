@@ -1,8 +1,10 @@
 # chrome-gcm-client
 Python client for [Chrome Google Cloud Messaging (GCM)](http://developer.chrome.com/apps/cloudMessaging.html).
+
 ## Requirements
 *   [requests](http://docs.python-requests.org/) - HTTP request, handles proxies etc.
 *   [omnijson](https://pypi.python.org/pypi/omnijson/) if you use Python 2.5 or older.
+
 ## Installation
 Install via pip
 
@@ -11,6 +13,7 @@ Install via pip
 or download source code and install via setup.py
 
     python setup.py install
+
 ## Usage
 ```python    
 from chromegcm import *
