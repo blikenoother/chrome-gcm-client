@@ -16,7 +16,13 @@ or download source code and install via setup.py
 
 ## Usage
 ```python    
-from chromegcmclient import *
+from chromegcmclient import PlainTextMessage
+from chromegcmclient import JSONMessage
+from chromegcmclient import ChromeGCM
+from chromegcmclient import ChromeGcmAuthenticationError
+from chromegcmclient import ChromeGcmBadRequestError
+from chromegcmclient import ChromeGcmUnexpectedError
+
 
 # your app info and authorized token
 auth_info = {
@@ -73,6 +79,7 @@ except ChromeGcmBadRequestError, e:
 except ChromeGcmUnexpectedError, e:
     print "Some unknown error occurred"
     print e.args[0]
+
 ```
 
 
