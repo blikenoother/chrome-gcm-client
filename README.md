@@ -12,11 +12,11 @@ Install via pip
     
 or download source code and install via setup.py
 
-    python setup.py install
+    sudo python setup.py install
 
 ## Usage
 ```python    
-from chromegcm import *
+from chromegcmclient import *
 
 # your app info and authorized token
 auth_info = {

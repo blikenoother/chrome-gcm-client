@@ -5,7 +5,7 @@ except ImportError:
 
 setup(
     name='chrome-gcm-client',
-    version='0.0.1,
+    version='0.0.1',
     author='Chirag',
     author_email='b.like.no.other@gmail.com',
     url='https://github.com/blikenoother/chrome-gcm-client',
