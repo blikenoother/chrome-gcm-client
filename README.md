@@ -82,5 +82,14 @@ except ChromeGcmUnexpectedError, e:
 
 ```
 
+As per google constraints, maximum message length should be 256 bytes. But when we tested, message was unable to send when message length is more than 130 char. So by default message will be truncated to 130 char. You can over write message length argument in `options` as well.
+```python
+# chrome channel_ids to send message
+channel_ids = ['channel_id_1', 'channel_id_2', 'channel_id_3']
+options = {'message_lenght': 50}
+
+plain_text_msg = PlainTextMessage('test message', channel_ids, options)
+
+```
 
 Chirag (blikenoother -[at]- gmail [dot] com)
