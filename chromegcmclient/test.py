@@ -4,11 +4,11 @@
 # Email: b.like.no.other@gmail.com
 
 import unittest
-from chromegcmclient.chromegcm import ChromeGCM
-from chromegcmclient.chromegcm import ChromeGcmBadRequestError
-from chromegcmclient.chromegcm import PlainTextMessage
-from chromegcmclient.chromegcm import JSONMessage
-from chromegcmclient.chromegcm import ChromeGcmAuthenticationError
+from chromegcmclient import ChromeGCM
+from chromegcmclient import ChromeGcmBadRequestError
+from chromegcmclient import PlainTextMessage
+from chromegcmclient import JSONMessage
+from chromegcmclient import ChromeGcmAuthenticationError
 
 
 class ChromeGCMClientTest(unittest.TestCase):
@@ -29,6 +29,8 @@ class ChromeGCMClientTest(unittest.TestCase):
         self.invalid_channel_ids = ['THIS_IS_INVALID_CHANNEL_ID']
         self.channel_ids = self.valid_channel_ids + self.invalid_channel_ids
 
+        self.options = {'message_lenght': 50}
+
     def test_auth(self):
         # should raise error when auth_info type is not in [str, dict]
         self.assertRaises(ValueError, ChromeGCM, 123)
@@ -46,8 +48,13 @@ class ChromeGCMClientTest(unittest.TestCase):
         self.assertIsInstance(cgcm.token_expires_in, long)
 
     def test_send(self):
+        # should raise error when options is not dict
+        self.assertRaises(ValueError, PlainTextMessage,
+                          message='msg', channel_ids=[], options='not_dict')
+
         # message objects
-        tmsg = PlainTextMessage(self.text_message, self.channel_ids)
+        tmsg = PlainTextMessage(self.text_message, self.channel_ids,
+                                self.options)
         jmsg = JSONMessage(self.json_message, self.channel_ids)
 
         # should raise error when access_token is invalid
