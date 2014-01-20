@@ -41,20 +41,32 @@ class ChromeGcmUnexpectedError(Exception):
 class Message(object):
     """ Base message class. """
 
-    def __init__(self, message, channel_ids, subchannel_id=0):
+    # recognized options
+    __options = {
+        'subchannel_id': 0,
+        'message_lenght': 130
+    }
+
+    def __init__(self, message, channel_ids, options={}):
         """ Abstract message.
 
             :Arguments:
                 - `message` (str or dict): payload of this message.
                 - `channel_ids` (lists): chrome channel id's to send message.
-                - `subchannel_id` (int): chrome sub channel id
+                - `options` (dict): optional
+                    - `subchannel_id` (int): default is 0.
+                    - `message_lenght` (int): truncate message if length exceeds payload size limit, default is 130 char.
 
             Refer to `Send message <http://developer.chrome.com/apps/cloudMessaging.html#message>`_
             for more explanation on available options.
         """
         self._message = message
         self.__channel_ids = channel_ids
-        self.__subchannel_id = subchannel_id
+
+        if not isinstance(options, dict):
+            raise ValueError('Invalid options type. Please refer docstring.')
+
+        self.__options = dict(self.__options.items() + options.items())
 
     def _prepare_payload(self):
         """ Hook to format message data payload. """
@@ -66,9 +78,9 @@ class Message(object):
         return self.__channel_ids
 
     @property
-    def subchannel_id(self):
-        """ Target sub channel id. """
-        return self.__subchannel_id
+    def options(self):
+        """ Options (known keys: subchannel_id, message_lenght). """
+        return self.__options
 
 
 class PlainTextMessage(Message):
@@ -156,7 +168,8 @@ class ChromeGCM(object):
             }
 
         payload = message._prepare_payload()
-        subchannel_id = message.subchannel_id
+        payload = payload[:message.options.get('message_lenght')]
+        subchannel_id = message.options.get('subchannel_id')
 
         # send notification
         success = []
